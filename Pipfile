@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pynvim = "*"
+python-language-server = {extras = ["all"],version = "*"}
+pyls-isort = "*"
+
+[packages]
+torch = "*"
+torchvision = "*"
+dill = "*"
+
+[requires]
+python_version = "3.7"
