@@ -7,4 +7,4 @@
 - Numpy
 - Pillow
 - Torch 1.1.0
-- Torchvision
+- Torchvision 0.3.0

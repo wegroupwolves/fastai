@@ -116,7 +116,7 @@ dep_groups = {
     ),
     "vision": to_list(
         """
-        torchvision
+        torchvision==0.3.0
 """
     ),
 }
