@@ -8,6 +8,7 @@ from setuptools import setup, find_packages
 
 from distutils.core import Command
 
+
 class DepsCommand(Command):
     """A custom distutils command to print selective dependency groups.
 
@@ -21,17 +22,17 @@ class DepsCommand(Command):
     python setup.py -q deps --help
     """
 
-    description = 'show dependency groups and their packages'
+    description = "show dependency groups and their packages"
     user_options = [
         # format: (long option, short option, description).
-        ('dep-groups=', None, 'comma separated dependency groups'),
-        ('dep-quote',   None, 'quote each dependency'),
-        ('dep-conda',   None, 'adjust output for conda'),
+        ("dep-groups=", None, "comma separated dependency groups"),
+        ("dep-quote", None, "quote each dependency"),
+        ("dep-conda", None, "adjust output for conda"),
     ]
 
     def initialize_options(self):
         """Set default values for options."""
-        self.dep_groups = ''
+        self.dep_groups = ""
         self.dep_quote = False
         self.dep_conda = False
 
@@ -41,7 +42,7 @@ class DepsCommand(Command):
 
     def parse(self):
         arg = self.dep_groups.strip()
-        return re.split(r' *, *', arg) if len(arg) else []
+        return re.split(r" *, *", arg) if len(arg) else []
 
     def run(self):
         """Run command."""
@@ -50,8 +51,10 @@ class DepsCommand(Command):
         deps = []
         invalid_groups = []
         for grp in wanted_groups:
-            if grp in dep_groups: deps.extend(dep_groups[grp])
-            else:                 invalid_groups.append(grp)
+            if grp in dep_groups:
+                deps.extend(dep_groups[grp])
+            else:
+                invalid_groups.append(grp)
 
         if invalid_groups or not wanted_groups:
             print("Available dependency groups:", ", ".join(sorted(dep_groups.keys())))
@@ -64,9 +67,9 @@ class DepsCommand(Command):
             if self.dep_conda:
                 for i in range(len(deps)):
                     # strip pip-specific syntax
-                    deps[i] = re.sub(r';.*',     '',         deps[i])
+                    deps[i] = re.sub(r";.*", "", deps[i])
                     # rename mismatching package names
-                    deps[i] = re.sub(r'^torch>', 'pytorch>', deps[i])
+                    deps[i] = re.sub(r"^torch>", "pytorch>", deps[i])
             if self.dep_quote:
                 # for manual copy-n-paste (assuming no " in vars)
                 print(" ".join(map(lambda x: f'"{x}"', deps)))
@@ -74,14 +77,21 @@ class DepsCommand(Command):
                 # if fed directly to `pip install` via backticks/$() don't quote
                 print(" ".join(deps))
 
-# note: version is maintained inside fastai/version.py
-exec(open('fastai/version.py').read())
 
-with open('README.md') as readme_file: readme = readme_file.read()
+# note: version is maintained inside fastai/version.py
+exec(open("fastai/version.py").read())
+
+with open("README.md") as readme_file:
+    readme = readme_file.read()
 
 # helper functions to make it easier to list dependencies not as a python list, but vertically w/ optional built-in comments to why a certain version of the dependency is listed
-def cleanup(x): return re.sub(r' *#.*', '', x.strip()) # comments
-def to_list(buffer): return list(filter(None, map(cleanup, buffer.splitlines())))
+def cleanup(x):
+    return re.sub(r" *#.*", "", x.strip())  # comments
+
+
+def to_list(buffer):
+    return list(filter(None, map(cleanup, buffer.splitlines())))
+
 
 ### normal dependencies ###
 #
@@ -92,31 +102,23 @@ def to_list(buffer): return list(filter(None, map(cleanup, buffer.splitlines()))
 #
 # IMPORTANT: when updating these, please make sure to sync conda/meta.yaml
 dep_groups = {
-    'core':   to_list("""
-        bottleneck           # performance-improvement for numpy
+    "core": to_list(
+        """
         dataclasses ; python_version<'3.7'
         fastprogress>=0.1.19
-        beautifulsoup4
-        matplotlib
-        numexpr              # performance-improvement for numpy
-        numpy>=1.15
-        nvidia-ml-py3
-        pandas
-        packaging
         Pillow
-        pyyaml
-        pynvx>=1.0.0 ; platform_system=="Darwin"  # only pypi at the moment
-        requests
-        scipy
-        torch>=1.0.0
-        typing
-"""),
-    'text':   to_list("""
-        spacy>=2.0.18
-"""),
-    'vision': to_list("""
+        torch==1.1.0
+"""
+    ),
+    "text": to_list(
+        """
+"""
+    ),
+    "vision": to_list(
+        """
         torchvision
-"""),
+"""
+    ),
 }
 
 requirements = [y for x in dep_groups.values() for y in x]
@@ -139,7 +141,9 @@ requirements = [y for x in dep_groups.values() for y in x]
 #
 # some of the listed modules appear in test_requirements as well, as explained below.
 #
-dev_requirements = { 'dev' : to_list("""
+dev_requirements = {
+    "dev": to_list(
+        """
     coverage                     # make coverage
     distro
     ipython
@@ -156,15 +160,19 @@ dev_requirements = { 'dev' : to_list("""
     responses                    # for requests testing
     traitlets
     wheel>=0.30.0
-""") }
+"""
+    )
+}
 
 ### setup dependencies ###
 # need at least setuptools>=36.2 to support syntax:
 #   dataclasses ; python_version<'3.7'
-setup_requirements = to_list("""
+setup_requirements = to_list(
+    """
     pytest-runner
     setuptools>=36.2
-""")
+"""
+)
 
 # notes:
 #
@@ -174,48 +182,40 @@ setup_requirements = to_list("""
 #   pip install -e .[dev]
 #
 ### test dependencies ###
-test_requirements = to_list("""
+test_requirements = to_list(
+    """
     pytest
-""")
+"""
+)
 
 # list of classifiers: https://pypi.org/pypi?%3Aaction=list_classifiers
 setup(
-    cmdclass = { 'deps': DepsCommand },
-
-    name = 'fastai',
-    version = __version__,
-
-    packages = find_packages(),
-    include_package_data = True,
-
-    install_requires = requirements,
-    setup_requires   = setup_requirements,
-    extras_require   = dev_requirements,
-    tests_require    = test_requirements,
-    python_requires  = '>=3.6',
-
-    test_suite = 'tests',
-
-    description = "fastai makes deep learning with PyTorch faster, more accurate, and easier",
-    long_description = readme,
-    long_description_content_type = 'text/markdown',
-    keywords = 'fastai, deep learning, machine learning',
-
-    license = "Apache Software License 2.0",
-
-    url = 'https://github.com/fastai/fastai',
-
-    author = "Jeremy Howard",
-    author_email = 'info@fast.ai',
-
-    classifiers = [
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: Apache Software License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
+    cmdclass={"deps": DepsCommand},
+    name="fastai",
+    version=__version__,
+    packages=find_packages(),
+    include_package_data=True,
+    install_requires=requirements,
+    setup_requires=setup_requirements,
+    extras_require=dev_requirements,
+    tests_require=test_requirements,
+    python_requires=">=3.6",
+    test_suite="tests",
+    description="fastai makes deep learning with PyTorch faster, more accurate, and easier",
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    keywords="fastai, deep learning, machine learning",
+    license="Apache Software License 2.0",
+    url="https://github.com/fastai/fastai",
+    author="Jeremy Howard",
+    author_email="info@fast.ai",
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: Apache Software License",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
-
-    zip_safe = False,
+    zip_safe=False,
 )
