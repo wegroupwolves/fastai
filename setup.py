@@ -106,7 +106,7 @@ dep_groups = {
         """
         dataclasses ; python_version<'3.7'
         fastprogress>=0.1.19
-        Pillow
+        Pillow<7
         torch==1.1.0
 """
     ),
