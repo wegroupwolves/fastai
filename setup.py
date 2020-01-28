@@ -107,7 +107,7 @@ dep_groups = {
         dataclasses ; python_version<'3.7'
         fastprogress>=0.1.19
         Pillow<7
-        torch==1.1.0
+        'https://download.pytorch.org/whl/cpu/torch-1.1.0-cp37-cp37m-linux_x86_64.whl'
 """
     ),
     "text": to_list(
@@ -116,7 +116,7 @@ dep_groups = {
     ),
     "vision": to_list(
         """
-        torchvision==0.3.0
+        'https://download.pytorch.org/whl/cpu/torchvision-0.3.0-cp37-cp37m-linux_x86_64.whl'
 """
     ),
 }
